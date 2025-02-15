@@ -1,0 +1,6 @@
+[submodule "llama.cpp"]
+	path = llama.cpp
+	url = https://github.com/ggerganov/llama.cpp.git
+[submodule "MixEval"]
+	path = MixEval
+	url = https://github.com/Psycoy/MixEval.git

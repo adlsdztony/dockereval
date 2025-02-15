@@ -1,0 +1,39 @@
+
+networks:
+  bridge:
+    driver: bridge
+
+services:
+  llamacpp:
+    build:
+      context: .
+      dockerfile: llamacpp.Dockerfile
+      target: server
+      args:
+        - UBUNTU_VERSION=${UBUNTU_VERSION}
+        - CUDA_VERSION=${CUDA_VERSION}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - bridge
+    volumes:
+      - $MODEL_PATH:/models
+    command: -m /models/$MODEL_NAME --port 8000 --host 0.0.0.0 -n 512 --n-gpu-layers -1
+
+  mixeval:
+    depends_on:
+      - llamacpp
+    build:
+      context: .
+      dockerfile: mixeval.Dockerfile
+    volumes:
+      - $OUTPUT_DIR:/output
+    networks:
+      - bridge
+    command: -m mix_eval.evaluate --model_name llamacpp --freeform_judge $FREEFORM_JUDGE --multichoice_judge $MULTICHOICE_JUDGE --api_base_url $API_BASE_URL --api_parallel_num $API_PARALLEL_NUM --benchmark $BENCHMARK --version $VERSION --batch_size $BATCH_SIZE --max_gpu_memory $MAX_GPU_MEMORY --output_dir /output
+
