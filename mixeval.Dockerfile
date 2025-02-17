@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY ./MixEval .
 
+COPY ./.env /app/
+
 COPY ./llamacpp.py /app/mix_eval/models/llamacpp.py
 
 # edit /app/mix_eval/models/__init__.py
